@@ -2,7 +2,7 @@ import sys
 from omegaconf import OmegaConf
 import torch
 from tqdm import tqdm
-from src.smirk_trainer import SmirkTrainer
+from libsmirk.smirk_trainer import SmirkTrainer
 import os
 from datasets.data_utils import load_dataloaders
 

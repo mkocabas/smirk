@@ -2,12 +2,12 @@ import torch
 import cv2
 import numpy as np
 from skimage.transform import estimate_transform, warp
-from src.smirk_encoder import SmirkEncoder
-from src.FLAME.FLAME import FLAME
-from src.renderer.renderer import Renderer
+from libsmirk.smirk_encoder import SmirkEncoder
+from libsmirk.FLAME.FLAME import FLAME
+from libsmirk.renderer.renderer import Renderer
 import argparse
 import os
-import src.utils.masking as masking_utils
+import libsmirk.utils.masking as masking_utils
 from utils.mediapipe_utils import run_mediapipe
 from datasets.base_dataset import create_mask
 import torch.nn.functional as F
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     smirk_encoder.eval()
 
     if args.use_smirk_generator:
-        from src.smirk_generator import SmirkGenerator
+        from libsmirk.smirk_generator import SmirkGenerator
         smirk_generator = SmirkGenerator(in_channels=6, out_channels=3, init_features=32, res_blocks=5).to(args.device)
 
         checkpoint_generator = {k.replace('smirk_generator.', ''): v for k, v in checkpoint.items() if 'smirk_generator' in k} # checkpoint includes both smirk_encoder and smirk_generator
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # ---- visualize the results ---- #
 
     flame = FLAME().to(args.device)
-    renderer = Renderer().to(args.device)
+    renderer = Renderer(render_full_head=True).to(args.device)
 
 
     cap = cv2.VideoCapture(args.input_path)
@@ -104,6 +104,7 @@ if __name__ == '__main__':
 
     cap_out = cv2.VideoWriter(f"{args.out_path}/{args.input_path.split('/')[-1].split('.')[0]}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), video_fps, (out_width, out_height))
 
+    idx = 0
     while True:
         ret, image = cap.read()
 
@@ -111,12 +112,13 @@ if __name__ == '__main__':
             break
     
         kpt_mediapipe = run_mediapipe(image)
-
+        print(f"Frame {idx} of {cap.get(cv2.CAP_PROP_FRAME_COUNT)}")
         # crop face if needed
         if args.crop:
             if (kpt_mediapipe is None):
                 print('Could not find landmarks for the image using mediapipe and cannot crop the face. Exiting...')
-                exit()
+                continue
+                # exit()
             
             kpt_mediapipe = kpt_mediapipe[..., :2]
 
@@ -139,6 +141,7 @@ if __name__ == '__main__':
         outputs = smirk_encoder(cropped_image)
 
         flame_output = flame.forward(outputs)
+        
         renderer_output = renderer.forward(flame_output['vertices'], outputs['cam'],
                                             landmarks_fan=flame_output['landmarks_fan'], landmarks_mp=flame_output['landmarks_mp'])
         
@@ -212,6 +215,7 @@ if __name__ == '__main__':
         grid_numpy = grid_numpy.astype(np.uint8)
         grid_numpy = cv2.cvtColor(grid_numpy, cv2.COLOR_BGR2RGB)
         cap_out.write(grid_numpy)
+        idx += 1
 
     cap.release()
     cap_out.release()

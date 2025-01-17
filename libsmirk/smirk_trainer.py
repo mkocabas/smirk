@@ -1,13 +1,13 @@
 import torch.utils.data
 import torch.nn.functional as F
-from src.FLAME.FLAME import FLAME
-from src.renderer.renderer import Renderer
-from src.smirk_encoder import SmirkEncoder
-from src.smirk_generator import SmirkGenerator
-from src.base_trainer import BaseTrainer 
+from libsmirk.FLAME.FLAME import FLAME
+from libsmirk.renderer.renderer import Renderer
+from libsmirk.smirk_encoder import SmirkEncoder
+from libsmirk.smirk_generator import SmirkGenerator
+from libsmirk.base_trainer import BaseTrainer 
 import numpy as np
-import src.utils.utils as utils
-import src.utils.masking as masking_utils
+import libsmirk.utils.utils as utils
+import libsmirk.utils.masking as masking_utils
 
 class SmirkTrainer(BaseTrainer):
     def __init__(self, config):

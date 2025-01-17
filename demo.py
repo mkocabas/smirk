@@ -2,12 +2,12 @@ import torch
 import cv2
 import numpy as np
 from skimage.transform import estimate_transform, warp
-from src.smirk_encoder import SmirkEncoder
-from src.FLAME.FLAME import FLAME
-from src.renderer.renderer import Renderer
+from libsmirk.smirk_encoder import SmirkEncoder
+from libsmirk.FLAME.FLAME import FLAME
+from libsmirk.renderer.renderer import Renderer
 import argparse
 import os
-import src.utils.masking as masking_utils
+import libsmirk.utils.masking as masking_utils
 from utils.mediapipe_utils import run_mediapipe
 from datasets.base_dataset import create_mask
 import torch.nn.functional as F
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     smirk_encoder.eval()
 
     if args.use_smirk_generator:
-        from src.smirk_generator import SmirkGenerator
+        from libsmirk.smirk_generator import SmirkGenerator
         smirk_generator = SmirkGenerator(in_channels=6, out_channels=3, init_features=32, res_blocks=5).to(args.device)
 
         checkpoint_generator = {k.replace('smirk_generator.', ''): v for k, v in checkpoint.items() if 'smirk_generator' in k} # checkpoint includes both smirk_encoder and smirk_generator

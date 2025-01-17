@@ -311,7 +311,15 @@ class FLAME(nn.Module):
             'vertices': vertices, 
             'landmarks_fan': landmarks2d, 
             'landmarks_fan_3d': landmarks3d, 
-            'landmarks_mp': landmarksmp
+            'landmarks_mp': landmarksmp,
+            'expression_params': expression_params,
+            'shape_params': shape_params,
+            'pose_params': pose_params,
+            'neck_pose_params': neck_pose_params,
+            'jaw_params': jaw_params,
+            'eye_pose_params': eye_pose_params,
+            'eyelid_params': eyelid_params,
         }
+
 
 
