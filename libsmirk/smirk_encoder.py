@@ -4,7 +4,7 @@ from torch import nn
 import timm
 
 
-def create_backbone(backbone_name, pretrained=True):
+def create_backbone(backbone_name, pretrained=False):
     backbone = timm.create_model(backbone_name, 
                         pretrained=pretrained,
                         features_only=True)
